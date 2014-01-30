@@ -30,6 +30,7 @@ namespace Arena.Custom.HDC.Twilio
 
         public void SendMessage(int personID, int communicationID, string toNumber, string fromNumber, string fromName, string message, string userID)
         {
+            PersonCommunication pc;
             TwilioRestClient twilio = new TwilioRestClient(_username, _password);
             LookupCollection validNumbers = new LookupCollection(new Guid("11B4ADEC-CB8C-4D01-B99E-7A0FFE2007B5"));
             SMSMessage msg;
@@ -37,6 +38,21 @@ namespace Arena.Custom.HDC.Twilio
             String twilioNumber = null;
             String callback;
 
+
+            //
+            // Check if this message has already been sent. The agent seems to be broken and
+            // will send each SMS message twice in rapid succession. If the communication is
+            // no longer pending or queued, assume it has already been sent and silently ignore.
+            //
+            if (personID != -1 && communicationID != -1)
+            {
+                pc = new PersonCommunication(personID, communicationID);
+                if (pc.CommunicationID != -1)
+                {
+                    if (pc.Status != "Pending" && pc.Status != "Queued")
+                        return;
+                }
+            }
 
             //
             // Get the first enabled twilio number, use that as the default.
