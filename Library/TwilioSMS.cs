@@ -33,7 +33,7 @@ namespace Arena.Custom.HDC.Twilio
             PersonCommunication pc;
             TwilioRestClient twilio = new TwilioRestClient(_username, _password);
             LookupCollection validNumbers = new LookupCollection(new Guid("11B4ADEC-CB8C-4D01-B99E-7A0FFE2007B5"));
-            SMSMessage msg;
+            Message msg;
             SmsHistory history;
             String twilioNumber = null;
             String callback;
@@ -87,7 +87,7 @@ namespace Arena.Custom.HDC.Twilio
             if (String.IsNullOrEmpty(twilioNumber))
             {
                 if (communicationID != -1 && personID != -1)
-                    new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- Invalid from number specified");
+                    new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- Invalid from number specified", ArenaContext.Current.Organization.OrganizationID);
 
                 return;
             }
@@ -99,7 +99,7 @@ namespace Arena.Custom.HDC.Twilio
             if (String.IsNullOrEmpty(toNumber))
             {
                 if (communicationID != -1 && personID != -1)
-                    new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- No SMS number available");
+                    new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- No SMS number available", ArenaContext.Current.Organization.OrganizationID);
 
                 return;
             }
@@ -119,15 +119,32 @@ namespace Arena.Custom.HDC.Twilio
             //
             if (communicationID != -1 && personID != -1)
             {
-                new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Pushed");
+                new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Pushed", ArenaContext.Current.Organization.OrganizationID);
+            }
+
+            //
+            // Verify that the twilio object exists.
+            //
+            if (twilio == null)
+            {
+                new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- Could not initialize Twilio library.", ArenaContext.Current.Organization.OrganizationID);
+
+                return;
             }
 
             //
             // Send the message.
             //
-            msg = twilio.SendSmsMessage(twilioNumber, toNumber, message, callback);
+            msg = twilio.SendMessage(twilioNumber, toNumber, message, callback);
             if (personID != -1 && communicationID != -1)
             {
+                if (msg == null)
+                {
+                    new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, "Failed -- Could not contact Twilio API.", ArenaContext.Current.Organization.OrganizationID);
+
+                    return;
+                }
+
                 if (String.IsNullOrEmpty(msg.Sid))
                 {
                     if (communicationID != -1 && personID != -1)
@@ -140,7 +157,8 @@ namespace Arena.Custom.HDC.Twilio
                             reason = String.Format("Failed -- SMS provider did not accept message ({0}).", msg.Status);
                         else
                             reason = String.Format("Failed -- SMS provider did not accept message (Unknown Error).");
-                        new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, reason);
+
+                        new PersonCommunicationData().SavePersonCommunication(communicationID, personID, DateTime.Now, reason, ArenaContext.Current.Organization.OrganizationID);
                     }
                 }
                 else
