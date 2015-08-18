@@ -21,13 +21,13 @@ namespace Arena.Custom.HDC.Twilio
 
         protected void SendButton_Click(object sender, EventArgs e)
         {
-            TwilioRestClient twilio = new TwilioRestClient("AC29585c84bb92353d0c2c96283bdf373b", "376ff4ed65d7089507cbc2270ec4e508");
+            TwilioRestClient twilio = new TwilioRestClient("account", "secret");
             SMSMessage msg = null;
 
 
             try
             {
-                msg = twilio.SendSmsMessage("+17605136237", tbToNumber.Text, tbMessage.Text, "https://www.highdesertchurch.com/UserControls/Custom/HDC/Twilio/SmsStatus.aspx");
+                msg = twilio.SendSmsMessage("+5555555555", tbToNumber.Text, tbMessage.Text, "https://arena.yourdomain.com/UserControls/Custom/HDC/Twilio/SmsStatus.aspx");
 //                SmsHistory history = new SmsHistory();
 //                history.CommunicationId = -1;
 //                history.PersonId = -1;
