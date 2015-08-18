@@ -229,7 +229,7 @@ namespace Arena.Custom.HDC.Twilio
                                 sb.Append("</ul></p>");
                             }
 
-                            ArenaSendMail.SendMail(String.Empty, String.Empty, lkTo.Qualifier2, "Received SMS message", sb.ToString());
+                            new ArenaSendMail().SendMail(String.Empty, String.Empty, lkTo.Qualifier2, "Received SMS message", sb.ToString());
                         }
                         catch (System.Exception ex)
                         {
