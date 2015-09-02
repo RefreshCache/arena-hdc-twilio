@@ -30,8 +30,10 @@
 
             // If there is only 1 real phone number, select it.
             var children = $(ddl).children();
-            if (children.length == 2)
+            if (children.length == 2) {
                 $(ddl).val($(ddl).children(':last').val());
+                $('input[id$="_tbEmail"]').val($(ddl).children(':last').val());
+            }
         }
         else {
             var tbEmail = $('input[id$="_tbEmail"]');
@@ -43,4 +45,3 @@
     });
 
 </script>
-
