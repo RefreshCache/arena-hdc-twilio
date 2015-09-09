@@ -1,3 +1,7 @@
-Current version is 1.1.
+Current Version is 1.2:
+Requires Arena 2014.2. Run the SQL scripts in order (version 1.0 and then version 1.2).
 
+Previus Versions:
+
+Version 1.1:
 Requires Arena 2012 and later (built for .NET 4). This version supports sending of messages >160 characters.
